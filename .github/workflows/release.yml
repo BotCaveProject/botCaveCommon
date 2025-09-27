@@ -1,56 +1,53 @@
-name: Package Monorepo TypeScript Libraries with pnpm
+name: Release Archives
 
 on:
   release:
     types: [created]
 
 jobs:
-  build-and-pack:
+  build-and-package:
     runs-on: ubuntu-latest
 
     steps:
       # 1. Checkout repo
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2. Setup Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      # 2. Setup Node + pnpm
+      - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: 22
           cache: 'pnpm'
 
-      # 3. Install pnpm
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
-      # 4. Install dependencies
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      # 3. Install deps
+      - run: pnpm install --frozen-lockfile
 
-      # 5. Build all packages
-      - name: Build packages
-        run: pnpm run build
+      # 4. Build all packages
+      - run: pnpm run build
 
-      # 6. Pack each package into .tgz
-      - name: Pack all packages
+      # 5. Pack each package
+      - name: Pack packages
         run: |
-          mkdir -p dist
+          mkdir -p dist/archives
           for pkg in $(ls packages); do
             echo "Packing $pkg..."
             cd packages/$pkg
-            pnpm pack --pack-destination ../../dist
+            pnpm pack --pack-destination ../../dist/archives
             cd ../..
           done
 
-      # 7. List generated files
-      - name: List packed files
-        run: ls -lh dist
+      # 6. List archives
+      - run: ls -lh dist/archives
 
-      # 8. Upload each package as release asset
+      # 7. Upload archives as release assets
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.tgz
+          files: dist/archives/*.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
