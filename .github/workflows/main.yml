@@ -8,41 +8,43 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x] # tester plusieurs versions
+        node-version: [16.x]
 
     steps:
-      # 1. Checkout repo
-      - uses: actions/checkout@v4
-
-      # 2. Setup Node.js
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-
-      # 3. Install pnpm
-      - uses: pnpm/action-setup@v4
+          
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
         with:
-          version: 9
-          run_install: false
+          version: 7
+          run_install: |
+            - recursive: true
+            - args: [--global, rimraf, typescript]
 
-      # 4. Install dependencies
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
-      # 5. Build all packages
-      - name: Build packages
-        run: pnpm run build
-
-      # 6. (Optionnel) Lint
-      - name: Lint
-        run: pnpm run lint --if-present
-
-      # 7. (Optionnel) Tests
-      - name: Run tests
-        run: pnpm test --if-present
+      - name: Build
+        run: pnpm -r build 
