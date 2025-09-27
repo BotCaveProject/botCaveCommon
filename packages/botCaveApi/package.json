@@ -1,0 +1,10 @@
+{
+  "name": "@bot-cave-common/api-types",
+  "version": "1.0.0",
+  "description": "Typings of the calendar api",
+  "types": "_dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf _dist"
+  }
+}

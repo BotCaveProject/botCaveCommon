@@ -1,0 +1,22 @@
+{
+    "name": "bot-cave-common",
+    "private": true,
+    "version": "1.0.0",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "tsc -b packages/*",
+        "clean": "rm -rf packages/*/dist",
+        "lint": "eslint . --ext .ts,.tsx"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.30.0",
+        "@stylistic/eslint-plugin": "^5.1.0",
+        "eslint": "^9.30.0",
+        "rimraf": "^6.0.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.35.0"
+    }
+}
