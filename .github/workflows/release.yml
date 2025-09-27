@@ -1,53 +1,58 @@
-name: Release Archives
+name: Package Monorepo TypeScript Libraries with pnpm
 
 on:
   release:
     types: [created]
 
 jobs:
-  build-and-package:
+  build-and-pack:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
-      - uses: actions/checkout@v4
+      # 1. Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # 2. Setup Node + pnpm
-      - uses: actions/setup-node@v4
+      # 2. Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
           cache: 'pnpm'
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
+      # 3. Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      # 3. Install deps
-      - run: pnpm install --frozen-lockfile
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pnpm install
 
-      # 4. Build all packages
-      - run: pnpm run build
+      # 5. Compile all packages
+      - name: Build all packages
+        run: pnpm -r build
 
-      # 5. Pack each package
-      - name: Pack packages
+      # 6. Pack each package individually
+      - name: Pack all packages
         run: |
           mkdir -p dist/archives
-          for pkg in $(ls packages); do
-            echo "Packing $pkg..."
-            cd packages/$pkg
-            pnpm pack --pack-destination ../../dist/archives
-            cd ../..
+          for pkg in packages/*; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "Packing $(basename $pkg)..."
+              cd "$pkg"
+              pnpm pack --pack-destination ../../dist/archives
+              cd ../..
+            fi
           done
 
-      # 6. List archives
-      - run: ls -lh dist/archives
+      # 7. List archives
+      - name: List generated archives
+        run: ls -lh dist/archives
 
-      # 7. Upload archives as release assets
+      # 8. Upload all archives as release assets
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         with:
           files: dist/archives/*.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
