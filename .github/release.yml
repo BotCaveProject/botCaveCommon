@@ -1,0 +1,56 @@
+name: Package Monorepo TypeScript Libraries with pnpm
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      # 3. Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. Build all packages
+      - name: Build packages
+        run: pnpm run build
+
+      # 6. Pack each package into .tgz
+      - name: Pack all packages
+        run: |
+          mkdir -p dist
+          for pkg in $(ls packages); do
+            echo "Packing $pkg..."
+            cd packages/$pkg
+            pnpm pack --pack-destination ../../dist
+            cd ../..
+          done
+
+      # 7. List generated files
+      - name: List packed files
+        run: ls -lh dist
+
+      # 8. Upload each package as release asset
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

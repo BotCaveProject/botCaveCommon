@@ -6,8 +6,8 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "tsc -b packages/*",
-        "clean": "rm -rf packages/*/dist",
+        "build": "pnpm -r build",
+        "clean": "pnpm -r clean",
         "lint": "eslint . --ext .ts,.tsx"
     },
     "devDependencies": {
