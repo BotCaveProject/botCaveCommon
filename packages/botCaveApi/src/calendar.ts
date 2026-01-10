@@ -1,3 +1,5 @@
+import { TimeIntervalBody } from "./time"
+
 /** Post body params for the calendar sync route */
 export interface PostCalendarSync {
     /**"Target calendar id" */
@@ -21,7 +23,7 @@ export interface PostCalendarAvailabilities {
     /**Max number of available slots to return */
     limit?: number,
     /**Exclude a time range for all the days in the given interval */
-    excludedTimeSlots?: any
+    excludedTimeSlots?: TimeIntervalBody[]
 }
 
 /** Post body params for the calendar event creation route */

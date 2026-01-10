@@ -1,6 +1,6 @@
 {
   "name": "@bot-cave-common/api-types",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Typings of the calendar api",
   "types": "./_dist/index.d.ts",
   "exports": {

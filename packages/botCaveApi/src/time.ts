@@ -15,3 +15,8 @@ export interface TimeInterval {
     from: Time,
     to: Time
 }
+
+export interface TimeIntervalBody {
+    from: `${number}${number}:${number}${number}:${number}${number}`,
+    to: `${number}${number}:${number}${number}:${number}${number}`
+}
