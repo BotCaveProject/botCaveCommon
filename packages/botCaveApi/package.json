@@ -2,7 +2,15 @@
   "name": "@bot-cave-common/api-types",
   "version": "1.0.0",
   "description": "Typings of the calendar api",
-  "types": "_dist/index.d.ts",
+  "types": "./_dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./_dist/index.d.ts"
+    }
+  },
+  "files": [
+    "_dist"
+  ],
   "scripts": {
     "build": "tsc -b",
     "clean": "rm -rf _dist"
